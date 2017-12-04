@@ -5,15 +5,28 @@
  */
 
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image } from 'react-native';
+import LoginPage from './src/components/LoginPage';
+import SignUpPage from './src/components/SignUpPage';
+import {StackNavigator} from 'react-navigation';
 
-export default class App extends Component<{}> {
+class App extends Component {
+  static navigationOptions = {
+    title: 'Welcome Page'
+  };
+
   render() {
     return (
       <View style={styles.viewstyle}>
         <Text style={styles.textstyle}>
-          Welcome to React Native!
+          Welcome to Banksy! Explore here
         </Text>
+        <Image style={styles.logo} source={require('./images/logo.jpg')} />
       </View>
     );
   }
@@ -21,12 +34,23 @@ export default class App extends Component<{}> {
 
 const styles = StyleSheet.create({
   viewstyle: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20
+    marginTop: 20,
   },
   textstyle: {
-    color: 'white'
+    color: '#ab1969',
+  },
+  logo: {
+    width: 500,
+    height: 500,
   }
 })
+
+const Navigation = StackNavigator({
+  Login: { screen: LoginPage },
+  SignUp: { screen: SignUpPage },
+  Welcome_Page: {screen: App}
+});
+
+export default Navigation;
