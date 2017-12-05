@@ -2,32 +2,33 @@ import React, {Component} from 'react';
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   Image,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
-  StatusBar
+  ScrollView,
 } from 'react-native';
+import Login from './LoginPage';
 
 
 export default class SignUpPage extends Component {
   static navigationOptions = {
-    title: 'Signup Page'
+    title: 'Signup Page',
   };
 
   render() {
+    const { goBack } = this.props.navigation;
+
     return(
-      <KeyboardAvoidingView style={styles.container}>
+      <ScrollView style={styles.container} keyboardShouldPersistTaps="never">
 
         <View style={styles.logoContainer}>
           <Image style={styles.logo} source={require('../../images/logo.jpg')} />
           <Text style={styles.title}> Welcome to Banksy! Sign up here </Text>
         </View>
 
-        <View style={styles.formContainer}>
-        
+        <KeyboardAvoidingView style={styles.formContainer}>
           <TextInput
             placeholder="Enter email/phone"
             placeholderTextColor="#fff"
@@ -60,8 +61,10 @@ export default class SignUpPage extends Component {
           <TouchableOpacity style={styles.buttonContainer} onPress={() => {}}>
             <Text style={styles.buttonText}>CREATE ACCOUNT</Text>
           </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+
+          <Text style={styles.linkText} onPress={() => goBack()}> AlREADY HAVE AN ACCOUNT? SIGN IN </Text>
+        </KeyboardAvoidingView>
+      </ScrollView>
     );
   }
 }
@@ -74,13 +77,12 @@ const styles = StyleSheet.create({
   logo: {
     width: 100,
     height: 100,
+    marginBottom: 20,
   },
   logoContainer: {
-    flex: 2,
+    margin: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 10,
-    padding: 5,
   },
   title: {
     color: '#fff',
@@ -91,22 +93,29 @@ const styles = StyleSheet.create({
   textInput: {
     height: 40,
     marginBottom: 20,
-    fontSize: 15,
+    fontSize: 18,
     color: '#fff',
     backgroundColor: '#34c2db',
     paddingHorizontal: 10,
   },
   buttonContainer: {
     backgroundColor: '#346Edb',
-    paddingVertical: 20,
+    paddingVertical: 15,
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
+    fontSize: 18,
     fontWeight: '700',
   },
   formContainer: {
     flex:2,
     padding: 20,
+  },
+  linkText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: 15,
+    marginTop: 20,
   }
 })

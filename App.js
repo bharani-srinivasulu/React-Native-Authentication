@@ -17,7 +17,8 @@ import {StackNavigator} from 'react-navigation';
 
 class App extends Component {
   static navigationOptions = {
-    title: 'Welcome Page'
+    title: 'Welcome Page',
+    headerLeft: null
   };
 
   render() {
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
 const Navigation = StackNavigator({
   Login: { screen: LoginPage },
   SignUp: { screen: SignUpPage },
-  Welcome_Page: {screen: App}
+  Welcome_Page: {screen: App},
 });
 
 export default Navigation;
