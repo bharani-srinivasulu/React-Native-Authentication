@@ -13,9 +13,27 @@ import Login from './LoginPage';
 
 
 export default class SignUpPage extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      wrongPasswords: ''
+    }
+  }
+
   static navigationOptions = {
     title: 'Signup Page',
   };
+
+  validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  }
+
+  comparePasswords() {
+    if(this.passwordInput._lastNativeText != this.confirmPasswordInput._lastNativeText)
+      this.setState({wrongPasswords: 'Password doesn\'t match'})
+  }
 
   render() {
     const { goBack } = this.props.navigation;
@@ -49,6 +67,12 @@ export default class SignUpPage extends Component {
             underlineColorAndroid='transparent'
             style={styles.textInput} />
 
+          <View>
+            <Text style={styles.errorMessage}>
+              {this.state.wrongPasswords}
+            </Text>
+          </View>
+
           <TextInput
             placeholder="Confirm password"
             placeholderTextColor="#fff"
@@ -56,9 +80,10 @@ export default class SignUpPage extends Component {
             secureTextEntry={true}
             ref={(input) => this.confirmPasswordInput = input}
             underlineColorAndroid='transparent'
+            onChangeText={(value) => this.comparePasswords.bind(this, value)}
             style={styles.textInput} />
 
-          <TouchableOpacity style={styles.buttonContainer} onPress={() => {}}>
+          <TouchableOpacity style={styles.buttonContainer} onPress={this.comparePasswords.bind(this)}>
             <Text style={styles.buttonText}>CREATE ACCOUNT</Text>
           </TouchableOpacity>
 
@@ -117,5 +142,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15,
     marginTop: 20,
+  },
+  errorMessage: {
+    color: 'red',
+    marginTop: -10,
+    textAlign: 'center',
+    fontSize: 18,
   }
 })

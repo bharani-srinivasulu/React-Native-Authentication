@@ -16,6 +16,14 @@ import App from '../../App';
 
 
 export default class LoginPage extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      wrongCredentials: ''
+    }
+  }
+
   static navigationOptions = {
     header: null
   };
@@ -43,18 +51,24 @@ export default class LoginPage extends Component {
     var email = this.emailInput._lastNativeText
 
     if(password == null || email == null)
-      Alert.alert('Email/password cannot be empty')
+      this.setState({wrongCredentials: 'Fields cannot be empty'})
 
-    if (this.validateEmail(email)){
+    else if (this.validateEmail(email)){
       if(this.validateInputCredentials(email, password)) {
-        navigate('Welcome_Page');
+        this.setState({wrongCredentials: ''})
         Keyboard.dismiss();
+        navigate('Welcome_Page');
       }
-      else
-        Alert.alert('Email password combination is incorrect')
+      else {
+        this.setState({wrongCredentials: 'Email/password combination doesn\'t exist'})
+      }
     }
     else
-      Alert.alert('Enter a valid email id')
+      this.setState({wrongCredentials: 'Enter correct input format'})
+  }
+
+  errorMessage() {
+    return this.state.wrongCredentials
   }
 
   render() {
@@ -69,6 +83,12 @@ export default class LoginPage extends Component {
         </View>
 
         <KeyboardAvoidingView style={styles.formContainer}>
+          <View>
+            <Text style={styles.errorMessage}>
+              {this.state.wrongCredentials ? this.errorMessage() : ''}
+            </Text>
+          </View>
+
           <TextInput
             placeholder="Enter email/phone"
             placeholderTextColor="#fff"
@@ -152,5 +172,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     marginTop: 20,
+  },
+  errorMessage: {
+    color: 'red',
+    marginTop: -10,
+    textAlign: 'center',
+    fontSize: 18,
   }
 })
