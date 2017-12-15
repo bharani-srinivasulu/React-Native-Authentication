@@ -31,7 +31,11 @@ export default class SignUpPage extends Component {
   }
 
   comparePasswords() {
-    if(this.passwordInput._lastNativeText != this.confirmPasswordInput._lastNativeText)
+    var password = this.passwordInput._lastNativeText
+    var confirmPassword = this.confirmPasswordInput._lastNativeText
+
+    if(password != null && confirmPassword != null)
+      if(password != confirmPassword)
       this.setState({wrongPasswords: 'Password doesn\'t match'})
   }
 
@@ -54,6 +58,7 @@ export default class SignUpPage extends Component {
             onSubmitEditing={() => this.passwordInput.focus()}
             keyboardType="email-address"
             autoCapitalize="none"
+            autoFocus={true}
             underlineColorAndroid='transparent'
             style={styles.textInput} />
 
@@ -80,10 +85,10 @@ export default class SignUpPage extends Component {
             secureTextEntry={true}
             ref={(input) => this.confirmPasswordInput = input}
             underlineColorAndroid='transparent'
-            onChangeText={(value) => this.comparePasswords.bind(this, value)}
+            onBlur={this.comparePasswords.bind(this)}
             style={styles.textInput} />
 
-          <TouchableOpacity style={styles.buttonContainer} onPress={this.comparePasswords.bind(this)}>
+          <TouchableOpacity style={styles.buttonContainer}>
             <Text style={styles.buttonText}>CREATE ACCOUNT</Text>
           </TouchableOpacity>
 
