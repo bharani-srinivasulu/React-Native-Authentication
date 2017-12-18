@@ -8,16 +8,19 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
+  AsyncStorage,
+  Alert
 } from 'react-native';
 import Login from './LoginPage';
-
+var User = require('../../app/controllers/user.controller.js');
 
 export default class SignUpPage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
-      wrongPasswords: ''
+      errorMessages: '',
+      successMessage: ''
     }
   }
 
@@ -25,18 +28,40 @@ export default class SignUpPage extends Component {
     title: 'Signup Page',
   };
 
+  async createRecords(username, password) { 
+    try {
+      await AsyncStorage.setItem(username, password);
+      User.create
+      this.setState({successMessage: 'Account created successfully!!!'});
+    }
+    catch(error) {}
+
+  }
+
+  comparePasswords() {
+    var email = this.emailInput._lastNativeText
+    var password = this.passwordInput._lastNativeText
+    var confirmPassword = this.confirmPasswordInput._lastNativeText
+
+    this.setState({errorMessages: ''})
+
+    if(email != null && password != null && confirmPassword != null)
+      if(password != confirmPassword)
+        this.setState({errorMessages: 'Passwords doesn\'t match'})
+  }
+
   validateEmail(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
   }
 
-  comparePasswords() {
+  verifyInput() {
+    var email = this.emailInput._lastNativeText
     var password = this.passwordInput._lastNativeText
-    var confirmPassword = this.confirmPasswordInput._lastNativeText
-
-    if(password != null && confirmPassword != null)
-      if(password != confirmPassword)
-      this.setState({wrongPasswords: 'Password doesn\'t match'})
+    
+    if(this.validateEmail(email))
+      this.createRecords(email, password)
+    
   }
 
   render() {
@@ -50,6 +75,12 @@ export default class SignUpPage extends Component {
           <Text style={styles.title}> Welcome to Banksy! Sign up here </Text>
         </View>
 
+        <View>
+          <Text style={styles.successMessage}>
+            {this.state.successMessage ? this.state.successMessage : ''}
+          </Text>
+        </View>
+
         <KeyboardAvoidingView style={styles.formContainer}>
           <TextInput
             placeholder="Enter email/phone"
@@ -58,6 +89,7 @@ export default class SignUpPage extends Component {
             onSubmitEditing={() => this.passwordInput.focus()}
             keyboardType="email-address"
             autoCapitalize="none"
+            ref={(input) => this.emailInput = input}
             autoFocus={true}
             underlineColorAndroid='transparent'
             style={styles.textInput} />
@@ -74,7 +106,7 @@ export default class SignUpPage extends Component {
 
           <View>
             <Text style={styles.errorMessage}>
-              {this.state.wrongPasswords}
+              {this.state.errorMessages}
             </Text>
           </View>
 
@@ -88,7 +120,7 @@ export default class SignUpPage extends Component {
             onBlur={this.comparePasswords.bind(this)}
             style={styles.textInput} />
 
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.buttonContainer} onPress={this.verifyInput.bind(this)}>
             <Text style={styles.buttonText}>CREATE ACCOUNT</Text>
           </TouchableOpacity>
 
@@ -153,5 +185,11 @@ const styles = StyleSheet.create({
     marginTop: -10,
     textAlign: 'center',
     fontSize: 18,
+  },
+  successMessage: {
+    color: '#008000',
+    fontSize: 20,
+    fontWeight: '500',
+    textAlign: 'center'
   }
 })

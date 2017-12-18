@@ -6,19 +6,19 @@
 
 import React, { Component } from 'react';
 import {
-  Platform,
   StyleSheet,
   Text,
   View,
   Image } from 'react-native';
+import { StackNavigator } from 'react-navigation';
 import LoginPage from './src/components/LoginPage';
 import SignUpPage from './src/components/SignUpPage';
-import {StackNavigator} from 'react-navigation';
+import ForgotPassword from './src/components/ForgotPassword';
 
 class App extends Component {
   static navigationOptions = {
     title: 'Welcome Page',
-    headerLeft: null
+    headerLeft: null,
   };
 
   render() {
@@ -46,13 +46,14 @@ const styles = StyleSheet.create({
   logo: {
     width: 500,
     height: 500,
-  }
-})
+  },
+});
 
 const Navigation = StackNavigator({
   Login: { screen: LoginPage },
   SignUp: { screen: SignUpPage },
-  Welcome_Page: {screen: App},
+  Forgot_Password: { screen: ForgotPassword },
+  Welcome_Page: { screen: App },
 });
 
 export default Navigation;

@@ -10,17 +10,18 @@ import {
   Keyboard,
   Alert,
   ScrollView,
+  AsyncStorage
 } from 'react-native';
 import SignUpPage from './SignUpPage';
-import App from '../../App';
-
+import ForgotPassword from './ForgotPassword';
 
 export default class LoginPage extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      wrongCredentials: ''
+      wrongCredentials: '',
+      token: ''
     }
   }
 
@@ -28,43 +29,37 @@ export default class LoginPage extends Component {
     header: null
   };
 
-  validateInputCredentials(email,password) {
-    var array = {
-      'bharani@gmail.com': 'bharani',
-      'bharani@enroco.com': '12'
-    }
-
-    if( array.hasOwnProperty(email) && array[email] === password ) {
-      return true
-    }
-
-    return false
-  }
-
   validateEmail(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
+  }
+
+  async getAccessKey() {
+    var email = this.emailInput._lastNativeText
+
+    if(email != null && this.validateEmail(email)) {
+      try {
+        let value = await AsyncStorage.getItem(email)
+        this.setState({token: value})
+      }
+      catch(error) {}
+    }
   }
 
   openWelcomePage(navigate) {
     var password = this.passwordInput._lastNativeText
     var email = this.emailInput._lastNativeText
 
-    if(password == null || email == null)
+    if(email == null || password == null)
       this.setState({wrongCredentials: 'Fields cannot be empty'})
-
-    else if (this.validateEmail(email)){
-      if(this.validateInputCredentials(email, password)) {
-        this.setState({wrongCredentials: ''})
-        Keyboard.dismiss();
-        navigate('Welcome_Page');
-      }
-      else {
-        this.setState({wrongCredentials: 'Email/password combination doesn\'t exist'})
-      }
+    else if(this.state.token) {
+      Keyboard.dismiss();
+      this.setState({wrongCredentials: ''})
+      navigate('Welcome_Page');
     }
-    else
-      this.setState({wrongCredentials: 'Enter correct input format'})
+    else {
+      this.setState({wrongCredentials: 'Email/password combination doesn\'t exist'})
+    }
   }
 
   errorMessage() {
@@ -96,7 +91,7 @@ export default class LoginPage extends Component {
             onSubmitEditing={() => this.passwordInput.focus()}
             keyboardType="email-address"
             autoCapitalize="none"
-            autoFocus={true}
+            onBlur={this.getAccessKey.bind(this)}
             underlineColorAndroid='transparent'
             ref={(input) => this.emailInput = input}
             style={styles.textInput} />
@@ -118,6 +113,7 @@ export default class LoginPage extends Component {
             <Text style={styles.buttonText}>LOGIN</Text>
           </TouchableOpacity>
 
+          <Text style={styles.linkText} onPress={() => navigate('Forgot_Password')}> Forgot password? </Text>
           <Text style={styles.linkText} onPress={() => navigate('SignUp')}> CREATE A NEW ACCOUNT </Text>
         </KeyboardAvoidingView>
       </ScrollView>
