@@ -12,7 +12,6 @@ import {
   Alert
 } from 'react-native';
 import Login from './LoginPage';
-var User = require('../../app/controllers/user.controller.js');
 
 export default class SignUpPage extends Component {
   constructor(props) {
@@ -31,7 +30,6 @@ export default class SignUpPage extends Component {
   async createRecords(username, password) { 
     try {
       await AsyncStorage.setItem(username, password);
-      User.create
       this.setState({successMessage: 'Account created successfully!!!'});
     }
     catch(error) {}
