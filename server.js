@@ -4,7 +4,8 @@ var express = require('express'),
   mongoose = require('mongoose')
   bodyParser = require('body-parser');
 
-var url =  'mongodb://localhost:27017/users';
+var url =  'mongodb://localhost:27017/UserRecords';
+var UserRecords = require('./app/models/userRecords')
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))

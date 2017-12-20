@@ -10,6 +10,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
+import axios from 'axios'
 
 export default class ForgotPassword extends Component {
   constructor(props) {
@@ -17,7 +18,9 @@ export default class ForgotPassword extends Component {
 
     this.state = {
       wrongCredentials: '',
-      successMessage: ''
+      successMessage: '',
+      userId: '',
+      passwordField: false ,
     }
   }
 
@@ -25,17 +28,38 @@ export default class ForgotPassword extends Component {
     title: 'Recover Account'
   };
 
-  validateInputCredentials(email) {
-    var array = [
-      'bharani@gmail.com',
-      'bharani@enroco.com'
-    ]
+  fetchData(email) {
+    var self = this;
 
-    if( array.includes(email) ) {
-      return true
-    }
+    axios.get('http://10.0.2.2:3000/users')
+      .then(function (response) {
+        response.data.map((user) => {
+          if(user['email_id'] == email) {
+            self.setState({wrongCredentials: '', passwordField: true, userId: user['_id']})
+          }
+          else {
+            self.setState({wrongCredentials: 'Account doesn\'t exist'})
+          }
+        });
 
-    return false
+        return true;
+      })
+      .catch(function (error) {
+        return false
+      });
+  }
+
+  updatePassword() {
+    var userId = this.state.userId
+    var password = this.passwordInput._lastNativeText
+
+    axios.put('http://10.0.2.2:3000/users/' + userId, {password: password})
+      .then(function (response){
+        console.error(response)
+      })
+      .catch(function (error) {
+        console.error(error)
+      })
   }
 
   validateEmail(email) {
@@ -43,7 +67,7 @@ export default class ForgotPassword extends Component {
     return re.test(email);
   }
 
-  verifyEmail(navigate) {
+  verifyEmail() {
     var email = this.emailInput._lastNativeText
     this.setState({ successMessage: '' })
 
@@ -52,14 +76,8 @@ export default class ForgotPassword extends Component {
     }
 
     else if (this.validateEmail(email)){
-      if(this.validateInputCredentials(email)) {
-        this.setState({wrongCredentials: ''})
-        this.setState({successMessage: 'Password reset link with instructions is mailed successfully!'})
-        Keyboard.dismiss();
-      }
-      else {
-        this.setState({wrongCredentials: 'Account doesn\'t exist'})
-      }
+      this.fetchData(email)
+      Keyboard.dismiss();
     }
 
     else
@@ -73,8 +91,6 @@ export default class ForgotPassword extends Component {
   }
 
   render() {
-    const { navigate } = this.props.navigation;
-    
     return (
       <ScrollView style={styles.container} keyboardShouldPersistTaps="never">
 
@@ -82,7 +98,7 @@ export default class ForgotPassword extends Component {
           <Image style={styles.logo} source={require('../../images/logo.jpg')} />
         </View>
         {
-          !this.state.successMessage ?
+          !this.state.passwordField ?
             <KeyboardAvoidingView style={styles.formContainer}>
               <Text style={styles.title}> Forgot your password ? Enter your email address below</Text>
               <View>
@@ -92,9 +108,9 @@ export default class ForgotPassword extends Component {
               </View>
 
               <TextInput
-                placeholder="Enter email/phone"
+                placeholder="Enter email"
                 placeholderTextColor="#fff"
-                returnKeyType="go"
+                returnKeyType="send"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoFocus={true}
@@ -105,20 +121,38 @@ export default class ForgotPassword extends Component {
               <TouchableOpacity
                 style={styles.buttonContainer}
                 ref="loginButton"
-                onPress={this.verifyEmail.bind(this, navigate)}>
+                onPress={this.verifyEmail.bind(this)}>
                 <Text style={styles.buttonText}>Submit</Text>
               </TouchableOpacity>
             </KeyboardAvoidingView> :
 
             <View>
               <Text style={styles.successMessage}>
-                {this.state.successMessage ?
-                  <Text>
-                    <Text>{this.state.successMessage}</Text>
-                    <Text style={{color: '#b71f6c', fontWeight: 'bold'}} onPress={() => this.emailInput.focus()}> Resend? </Text> 
-                  </Text> : ''
-                }
-              </Text>
+                 {this.state.successMessage ?
+                   <Text>
+                     <Text>{this.state.successMessage}</Text>
+                     <Text style={{color: '#b71f6c', fontWeight: 'bold'}} onPress={() => this.emailInput.focus()}> Resend? </Text> 
+                   </Text> : ''
+                 }
+               </Text>
+
+               <TextInput
+                placeholder="Enter password"
+                placeholderTextColor="#fff"
+                returnKeyType="send"
+                autoCapitalize="none"
+                autoFocus={true}
+                secureTextEntry={true}
+                underlineColorAndroid='transparent'
+                ref={(input) => this.passwordInput = input}
+                style={styles.textInput} />
+
+              <TouchableOpacity
+                style={styles.buttonContainer}
+                ref="loginButton"
+                onPress={this.updatePassword.bind(this)}>
+                <Text style={styles.buttonText}>Submit</Text>
+              </TouchableOpacity>
             </View>
         }
       </ScrollView>

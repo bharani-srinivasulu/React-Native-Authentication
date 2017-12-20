@@ -10,8 +10,9 @@ import {
   Keyboard,
   Alert,
   ScrollView,
-  AsyncStorage
+  AsyncStorage,
 } from 'react-native';
+import axios from 'axios'
 import SignUpPage from './SignUpPage';
 import ForgotPassword from './ForgotPassword';
 
@@ -21,8 +22,26 @@ export default class LoginPage extends Component {
 
     this.state = {
       wrongCredentials: '',
-      token: ''
+      userRecords: []
     }
+  }
+
+  componentWillMount() {
+    this.fetchData()
+  }
+
+  fetchData() {
+    var self = this;
+
+    axios.get('http://10.0.2.2:3000/users')
+      .then(function (response) {
+        emails = response.data.map((user) => user['email_id']);
+        self.setState({ userRecords: emails})
+        return true;
+      })
+      .catch(function (error) {
+        return false
+      });
   }
 
   static navigationOptions = {
@@ -34,25 +53,13 @@ export default class LoginPage extends Component {
     return re.test(email);
   }
 
-  async getAccessKey() {
-    var email = this.emailInput._lastNativeText
-
-    if(email != null && this.validateEmail(email)) {
-      try {
-        let value = await AsyncStorage.getItem(email)
-        this.setState({token: value})
-      }
-      catch(error) {}
-    }
-  }
-
   openWelcomePage(navigate) {
     var password = this.passwordInput._lastNativeText
     var email = this.emailInput._lastNativeText
 
     if(email == null || password == null)
       this.setState({wrongCredentials: 'Fields cannot be empty'})
-    else if(this.state.token) {
+    else if(this.validateEmail(email) && this.state.userRecords.includes(email)) {
       Keyboard.dismiss();
       this.setState({wrongCredentials: ''})
       navigate('Welcome_Page');
@@ -91,7 +98,6 @@ export default class LoginPage extends Component {
             onSubmitEditing={() => this.passwordInput.focus()}
             keyboardType="email-address"
             autoCapitalize="none"
-            onBlur={this.getAccessKey.bind(this)}
             underlineColorAndroid='transparent'
             ref={(input) => this.emailInput = input}
             style={styles.textInput} />

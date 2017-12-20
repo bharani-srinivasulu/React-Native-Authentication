@@ -1,17 +1,17 @@
-var User = require('../models/user.model.js');
+var UserRecords = require('../models/userRecords.js');
 var mongoose = require('mongoose');
 
 exports.create = function(req, res) {
   // Create and Save a new user
-  if(!req.body.title) {
-    res.status(400).send({message: "user can not be empty"+ req.body.content});
+  if(!req.body) {
+    res.status(400).send({message: "user can not be empty"+ req.body});
   }
-  var user = new User(req.body  );
+  var user = new UserRecords(req.body);
 
   user.save(function(err, data) {
     if(err) {
       console.log(err);
-      res.status(500).send({message: "Some error occurred while creating the user."});
+      res.status(500).send({message: "Some error occurred while creating the users."});
     } else {
       res.send(data);
     }
@@ -20,7 +20,7 @@ exports.create = function(req, res) {
 
 exports.findAll = function(req, res) {
   // Retrieve and return all users from the database.
-  User.find(function(err, users){
+  UserRecords.find(function(err, users){
     if(err) {
       res.status(500).send({message: "Some error occurred while retrieving users."});
     } else {
@@ -29,7 +29,7 @@ exports.findAll = function(req, res) {
       // Go through each user
       users.map(data => {
         // Initialize a model with user data
-        const user = new User(data);
+        const user = new UserRecords(data);
         // and save it into the database
         user.save();
       });
@@ -39,7 +39,7 @@ exports.findAll = function(req, res) {
 
 exports.findOne = function(req, res) {
   // Find a single user with a userId
-  User.findById(req.params.userId, function(err, data) {
+  UserRecords.findById(req.params.userId, function(err, data) {
     if(err) {
       res.status(500).send({message: "Could not retrieve user with id " + req.params.userId});
     } else {
@@ -50,13 +50,12 @@ exports.findOne = function(req, res) {
 
 exports.update = function(req, res) {
   // Update a user identified by the userId in the request
-  User.findById(req.params.userId, function(err, user) {
+  UserRecords.findById(req.params.userId, function(err, user) {
     if(err) {
       res.status(500).send({message: "Could not find a user with id " + req.params.userId});
     }
 
-    user.title = req.body.title;
-    user.content = req.body.content;
+    user.password = req.body.password;
 
     user.save(function(err, data){
       if(err) {
@@ -70,9 +69,9 @@ exports.update = function(req, res) {
 
 exports.delete = function(req, res) {
   // Delete a user with the specified userId in the request
-  User.remove({_id: req.params.userId}, function(err, data) {
+  UserRecords.remove({_id: req.params.userId}, function(err, data) {
     if(err) {
-      res.status(500).send({message: "Could not delete user with id " + req.params.id});
+      res.status(500).send({message: "Could not delete user with id " + req.params.userId});
     } else {
       res.send({message: "user deleted successfully!"})
     }

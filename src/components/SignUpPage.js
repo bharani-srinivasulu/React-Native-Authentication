@@ -9,9 +9,15 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   AsyncStorage,
-  Alert
+  Platform
 } from 'react-native';
+import axios from 'axios'
 import Login from './LoginPage';
+
+const host = Platform.select({
+    ios: 'localhost',
+    android: '10.0.2.2',
+});
 
 export default class SignUpPage extends Component {
   constructor(props) {
@@ -19,7 +25,7 @@ export default class SignUpPage extends Component {
 
     this.state = {
       errorMessages: '',
-      successMessage: ''
+      successMessage: '',
     }
   }
 
@@ -27,13 +33,17 @@ export default class SignUpPage extends Component {
     title: 'Signup Page',
   };
 
-  async createRecords(username, password) { 
-    try {
-      await AsyncStorage.setItem(username, password);
-      this.setState({successMessage: 'Account created successfully!!!'});
-    }
-    catch(error) {}
-
+  async createRecords(email, password) {
+    axios.post('http://10.0.2.2:3000/addname', {
+      email_id: email,
+      password: password
+    })
+    .then(function (response) {
+      console.error(response);
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
   }
 
   comparePasswords() {
@@ -42,6 +52,7 @@ export default class SignUpPage extends Component {
     var confirmPassword = this.confirmPasswordInput._lastNativeText
 
     this.setState({errorMessages: ''})
+
 
     if(email != null && password != null && confirmPassword != null)
       if(password != confirmPassword)
@@ -75,7 +86,7 @@ export default class SignUpPage extends Component {
 
         <View>
           <Text style={styles.successMessage}>
-            {this.state.successMessage ? this.state.successMessage : ''}
+          { this.state.successMessage ? this.state.successMessage : ''}
           </Text>
         </View>
 
