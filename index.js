@@ -1,4 +1,4 @@
 import { AppRegistry } from 'react-native';
-import App from './App';
+import Navigation from './App';
 
-AppRegistry.registerComponent('banksy_spike', () => App);
+AppRegistry.registerComponent('banksy_spike', () => Navigation);
